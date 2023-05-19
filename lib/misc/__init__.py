@@ -3,14 +3,6 @@ from math import *
 
 from .tags import *
 
-def capRange(a, lo, hi):
-    if a < lo:
-        return lo
-    elif a > hi:
-        return hi
-    else:
-        return a
-
 def lerp(a,b,t):
     return a + t*(b-a)
 

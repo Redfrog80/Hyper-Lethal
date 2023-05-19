@@ -11,6 +11,7 @@ class flakker(weapon):
         self.damage_base = self.damage_base or 14
         self.firerate_base = self.firerate_base or .6
         self.range_base = self.range_base or 300
+        self.sound_name = self.sound_name or "flakker"
         
         self.projectile_velocity_base = kwargs.get("projectile_velocity") or 700
         self.projectile_count = kwargs.get("projectile_count") or 15
@@ -26,6 +27,7 @@ class flakker(weapon):
     
     def fire_projectile(self, dt, world, **kwargs):
         if self.cooldown < 0:
+            self.sound_dict.get_sound(self.sound_name).play()
             self.cooldown = self.firerate_real
             for i in range(self.projectile_count):
                 bullet_rot = self.turret.rot + lerp(-self.projectile_firing_angle/2, self.projectile_firing_angle/2, (i+1)/(self.projectile_count+1))
@@ -37,6 +39,5 @@ class flakker(weapon):
                                     image_dict = self.image_dict)
                 bullet.traj(self.turret.pos, self.turret.vel, self.projectile_velocity_real*(uniform(.6,1)), bullet_rot + uniform(-10,10), 1)
                 world.__addlist__.append(bullet)
-            self.sound_dict.get_sound("flakker").play()
         self.cooldown -= dt
     

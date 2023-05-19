@@ -1,8 +1,8 @@
 import pygame
+from pygame import Vector2, Surface, Rect
+
 import random
 import threading
-import itertools
-from pygame import Surface, Rect
 
 from lib.misc import *
 from lib.managers import *
@@ -54,7 +54,7 @@ class GameWorld:
         self.sound_dict = kwargs.get("sound_dictionary") or soundDict("resources/sounds/")
         
         self.screen = kwargs.get("screen")
-        self.player = kwargs.get("player") or Player(pos = self.__dim__.center,
+        self.player = kwargs.get("player") or Player(pos = Vector2(self.__dim__.center),
                                                      image_dict = self.image_dict,
                                                      sound_dict = self.sound_dict)
 
@@ -147,29 +147,29 @@ class GameWorld:
             b = self.__dim__
             bounds = check_out_of_bound(b, obj)
             if bounds[0]:
-                obj.set_pos(element_add(obj.pos,(0,b.top - obj.top)))
+                obj.set_pos(obj.pos + Vector2(0,b.top - obj.top))
             if bounds[1]:
-                obj.set_pos(element_add(obj.pos,(b.left - obj.left,0)))
+                obj.set_pos(obj.pos + Vector2(b.left - obj.left,0))
             if bounds[2]:
-                obj.set_pos(element_add(obj.pos,(0,b.bottom - obj.bottom)))
+                obj.set_pos(obj.pos + Vector2(0,b.bottom - obj.bottom))
             if bounds[3]:
-                obj.set_pos(element_add(obj.pos,(b.right - obj.right,0)))
+                obj.set_pos(obj.pos + Vector2(b.right - obj.right,0))
         else:
             b = self.__dim__
             bounds = check_out_of_bound(b, obj)
 
             if bounds[0]:
-                obj.set_pos(element_add(obj.pos,(0,b.top - obj.top)))
-                obj.vel = (obj.vel[0], -obj.vel[1])
+                obj.set_pos(obj.pos + Vector2(0,b.top - obj.top))
+                obj.vel = Vector2(obj.vel.x, -obj.vel.y)
             if bounds[1]:
-                obj.set_pos(element_add(obj.pos,(b.left - obj.left,0)))
-                obj.vel = (-obj.vel[0], obj.vel[1])
+                obj.set_pos(obj.pos + Vector2(b.left - obj.left,0))
+                obj.vel = Vector2(-obj.vel.x, obj.vel.y)
             if bounds[2]:
-                obj.set_pos(element_add(obj.pos,(0,b.bottom - obj.bottom)))
-                obj.vel = (obj.vel[0], -obj.vel[1])
+                obj.set_pos(obj.pos + (0,b.bottom - obj.bottom))
+                obj.vel = Vector2(obj.vel.x, -obj.vel.y)
             if bounds[3]:
-                obj.set_pos(element_add(obj.pos,(b.right - obj.right,0)))
-                obj.vel = (-obj.vel[0], obj.vel[1])
+                obj.set_pos(obj.pos + Vector2(b.right - obj.right,0))
+                obj.vel = Vector2(-obj.vel.x, obj.vel.y)
 
     def set_player(self, player):
         self.player = player
@@ -255,7 +255,7 @@ class GameWorld:
             for _ in range(random.randint(*num_range)):
                 new_obj = obj_class(name = ENEMY_TAG + tag,
                                     tag = tag,
-                                    pos= randist(self.player.pos, (600, 1200), self.__dim__.size),
+                                    pos= Vector2(randist(self.player.pos, (600, 1200), self.__dim__.size)),
                                     image_dict = self.image_dict,
                                     sound_dict = self.sound_dict,
                                     world = self)

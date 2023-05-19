@@ -13,14 +13,20 @@ class faceBehavior(steering):
         
         if not self.target.liveflag:
             return steering
+        diff = self.target.pos - self.obj.pos
         
-        direction = degrees(atan2(*unit_tuple2(self.target.pos, self.obj.pos)))
+        direction = 0
         
-        difference = self.obj.rot - direction
+        if diff:
+            direction = degrees(atan2(*(diff).xy))
+        
+        difference = direction - self.obj.rot + 180
+        print(direction, self.obj.rot)
         
         while (abs(difference) > 180):
             difference -= 360*sign(difference)
 
+        print(difference)
         steering.rot_vel = difference
 
         return steering

@@ -30,9 +30,9 @@ world = GameWorld(dimensions = pygame.Rect(0, 0, 4000, 4000),
 
 controller = EventController(world)
 
-controller.addEventSpawn(7, 25, (1, 2), Assault, ENEMY_TAG)
-controller.addEventSpawn(2, 50, (1, 3), Kamikaze, ENEMY_TAG)
-controller.addEventSpawn(6, 5, (1, 2), Juggernaut, ENEMY_TAG)
+controller.addEventSpawn(4, 50, (1, 2), Assault, ENEMY_TAG)
+controller.addEventSpawn(2, 10, (1, 3), Kamikaze, ENEMY_TAG)
+controller.addEventSpawn(6, 8, (1, 2), Juggernaut, ENEMY_TAG)
 
 run = True
 test = 0

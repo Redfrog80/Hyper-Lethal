@@ -10,7 +10,7 @@ class dragBehavior(steering):
         
     def get_steering(self, steering_base: steeringBehavior, *args, **kwargs):
         steering = steering_data()
-        steering.acc = scalar_mul(self.obj.vel, -self.drag)
+        steering.acc = self.obj.vel*(-self.drag)
         steering.rot_vel = 0
         
         return steering

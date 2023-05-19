@@ -1,3 +1,4 @@
+from pygame import Vector2
 from .steering import *
 from lib.misc import *
 from lib.objects import Base
@@ -14,13 +15,16 @@ class faceVelBehavior(steering):
         if not self.target.liveflag:
             return steering
         
-        direction = degrees(atan2(*unit_tuple1(self.obj.vel)))
+        direction = 0
+        
+        if self.obj.acc:
+            direction = degrees(atan2(*self.obj.acc.xy))
 
-        difference = self.obj.rot - direction
+        difference = direction - self.obj.rot + 180
         
         while (abs(difference) > 180):
             difference -= 360*sign(difference)
 
         steering.rot_vel = difference
-        steering.acc = (0,0)
+        steering.acc = Vector2(0,0)
         return steering

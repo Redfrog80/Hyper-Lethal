@@ -1,8 +1,9 @@
 import math
 from random import random
-from pygame import image, surface, transform
+from pygame import Vector2, image, surface, transform, draw
 
 from lib.misc import *
+from lib.Ai import *
 from .Camera import Camera
 from ..weapons import turret, bolter, flakker
 from ..thrusters import thruster
@@ -21,10 +22,14 @@ class Player(Playable):
         kwargs["texture_size"] = kwargs.get("texture_size") or (64,64)
                 
         player_hull = hull()
-        player_thruster = thruster(1000,600,360)
+        player_thruster = thruster(600,500,360,.2)
         
         super().__init__(hull = player_hull,
                          thruster = player_thruster,  **kwargs)
+        
+        self.steeringBehavior = steeringBehavior(self, 
+                                                 player_thruster.get_acc(),
+                                                 player_thruster.get_rot_vel())
         
         weapon = bolter(projectile_tag = PLAYER_PROJECTILE_TAG,
                         projectile_texture_name = "bullet3",
@@ -33,8 +38,6 @@ class Player(Playable):
         
         self.turret = turret(name = "turret",
                              tag = TURRET_TAG,
-                             min_rot_vel = 200,
-                             max_rot_vel = 1000,
                              texture_size = self.texture_size,
                              texture_name = "aiming",
                              image_dict = self.image_dict,
@@ -44,37 +47,46 @@ class Player(Playable):
         self.turret.attach_weapon(weapon)
         self.turret.set_target()
         
+        self.thruster.attach_parent(self)
+        
     def set_world(self, world):
         super().set_world(world)
         self.world.add_game_object(self.turret)
+        self.steeringBehavior.add_steering_behavior(faceBehavior(4),world.cursor)
+
 
     def rotateLeft(self):
+        return
         self.rotvel = self.thruster.get_rot_vel()
 
     def rotateRight(self):
+        return
         self.rotvel = -self.thruster.get_rot_vel()
 
     def goForward(self):
-        self.acc = (-self.thruster.get_acc() * math.sin(self.rot * math.pi / 180),
+        self.acc = Vector2(-self.thruster.get_acc() * math.sin(self.rot * math.pi / 180),
                     -self.thruster.get_acc() * math.cos(self.rot * math.pi / 180))
 
     def goBack(self):
-        self.acc = (self.thruster.get_acc() * math.sin(self.rot * math.pi / 180),
+        self.acc = Vector2(self.thruster.get_acc() * math.sin(self.rot * math.pi / 180),
                     self.thruster.get_acc() * math.cos(self.rot * math.pi / 180))
 
     def rotateLeftStop(self):
+        return
         self.rotvel = 0
 
     def rotateRightStop(self):
+        return
         self.rotvel = 0
 
     def goForwardStop(self):
-        self.acc = (0, 0)
+        self.acc = Vector2(0,0)
 
     def stopAcc(self):
-        self.acc = (0, 0)
+        self.acc = Vector2(0,0)
         
     def stopRotVel(self):
+        return
         self.rotvel = 0
 
     def shoot(self, dt,  **kwargs):
@@ -109,11 +121,12 @@ class Player(Playable):
     def render(self):
         if self.collide_box(self.world.camera):  # render when object collide with camera view
             img0 = transform.rotate(self.texture, self.rot)
-            dummy = scalar_div(img0.get_size(),2)
-            self.world.screen.blit(img0, element_sub(element_sub(self.pos, self.world.camera.topLeft),dummy))
+            dummy = Vector2(img0.get_size()) / 2
+            self.world.screen.blit(img0, (self.pos - self.world.camera.topLeft - dummy).xy)
 
     def update(self, dt,  **kwargs):
         super().update(dt, **kwargs)
+        self.steeringBehavior.update(dt)
         # update turret
         target_rot = None
         # if (self.world):

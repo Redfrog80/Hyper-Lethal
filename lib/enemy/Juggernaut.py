@@ -49,12 +49,15 @@ class Juggernaut(Enemy):
 
         self.turret.attach_parent(self)
         self.turret.attach_weapon(weapon)
+        
+        self.thruster.attach_parent(self)
+
 
     def shoot(self, dt,  **kwargs):
         self.turret.fire(dt, **kwargs)
 
     def setTarget(self, target):
-        self.steeringBehavior.add_steering_behavior(arriveBehavior(1, 400, 2000), target)
+        self.steeringBehavior.add_steering_behavior(arriveBehavior(1, 400, 600), target)
         self.steeringBehavior.add_steering_behavior(fleeBehavior(.2), target)
         self.steeringBehavior.add_steering_behavior(faceBehavior(1), target)
         self.turret.set_target()
@@ -73,14 +76,17 @@ class Juggernaut(Enemy):
         super().update(dt, **kwargs)
         
         target_rot = None
-        if (self.world):
-            target_rot = degrees(math.atan2(*unit_tuple2(self.pos,self.target.pos)))
+        
+        diff = self.pos-self.target.pos
+        mag = diff.magnitude()
+        
+        if mag:
+            target_rot = degrees(math.atan2(*(diff/mag).xy))
         
         difference = self.turret.rot-target_rot
         while (abs(difference) > 180):
                     difference -= 360*sign(difference)
         
-        if (abs(difference) < 5 and magnitude(element_sub(self.pos, self.target.pos)) < self.turret.get_range()):
+        if (abs(difference) < 5 and mag < self.turret.get_range()):
             self.shoot(dt)
-        
         self.turret.target_rot = target_rot

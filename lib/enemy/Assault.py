@@ -1,4 +1,6 @@
 import math
+
+from pygame import Vector2
 from ..Ai import *
 from ..misc import *
 from ..hulls.defaultHull import hull
@@ -17,7 +19,7 @@ class Assault(Enemy):
         kwargs["texture_name"] = kwargs.get("texture_name") or "enemy2"
         
         enemy_hull = hull(50, 0.02, 0.005)
-        enemy_thruster = thruster(500, 100, 360)
+        enemy_thruster = thruster(500, 400, 360)
         
         self.steeringBehavior = steeringBehavior(self, 
                                                  enemy_thruster.get_acc(),
@@ -38,8 +40,6 @@ class Assault(Enemy):
         
         self.turret = turret(name = "turret",
                              tag="turret",
-                             min_rot_vel = 45,
-                             max_rot_vel = 180,
                              texture_size = self.texture_size,
                              texture_name = "aiming",
                              image_dict = self.image_dict,
@@ -47,14 +47,16 @@ class Assault(Enemy):
 
         self.turret.attach_parent(self)
         self.turret.attach_weapon(weapon)
+        
+        self.thruster.attach_parent(self)
 
     def shoot(self, dt,  **kwargs):
         self.turret.fire(dt, **kwargs)
 
     def setTarget(self, target):
-        self.steeringBehavior.add_steering_behavior(arriveBehavior(1.5, 50, 1000), target)
-        self.steeringBehavior.add_steering_behavior(evadeBehavior(.4,2), target)
-        self.steeringBehavior.add_steering_behavior(faceAccBehavior(2), target)
+        self.steeringBehavior.add_steering_behavior(arriveBehavior(1, 50, 300), target)
+        self.steeringBehavior.add_steering_behavior(evadeBehavior(.6,2), target)
+        self.steeringBehavior.add_steering_behavior(faceAccBehavior(1), target)
         self.turret.set_target(target)
         super().setTarget(target)
     
@@ -70,14 +72,18 @@ class Assault(Enemy):
         super().update(dt, **kwargs)
         
         target_rot = None
-        if (self.world):
-            target_rot = degrees(math.atan2(*unit_tuple2(self.pos,self.target.pos)))
+        
+        diff = self.pos - self.target.pos
+        mag = diff.magnitude()
+        
+        if mag:
+            target_rot = degrees(math.atan2(*(diff/mag).xy))
         
         difference = self.turret.rot-target_rot
         while (abs(difference) > 180):
                     difference -= 360*sign(difference)
         
-        if (abs(difference) < 5 and magnitude(element_sub(self.pos, self.target.pos)) < self.turret.get_range()):
+        if (abs(difference) < 5 and mag < self.turret.get_range()):
             self.shoot(dt)
-        
+
         self.turret.target_rot = target_rot

@@ -24,6 +24,7 @@ class weapon:
         
         self.turret = kwargs.get("turret")
 
+        self.sound_name = kwargs.get("sound_name")
         self.image_dict = kwargs.get("image_dict")
         self.sound_dict = kwargs.get("sound_dict")
         self.cooldown = 0
@@ -59,20 +60,7 @@ class weapon:
         pass
 
     def fire_projectile(self, dt, world,**kwargs):
-        if self.cooldown < 0:
-            self.cooldown = self.firerate_real
-            for i in range(self.projectile_count):
-                bullet_rot = self.turret.rot + lerp(-self.projectile_firing_angle/2, self.projectile_firing_angle/2, (i+1)/(self.projectile_count+1))
-                bullet = Projectile(name = self.turret.name + "_b",
-                                    tag = self.projectile_tag,
-                                    damage = self.damage_real,
-                                    life = self.projectile_life,
-                                    texture_size = self.projectile_size,
-                                    texture_name = self.projectile_texture_name,
-                                    image_dict = self.image_dict)
-                bullet.traj(self.turret.pos, self.turret.vel, self.projectile_velocity_real, bullet_rot, 1)
-                world.__addlist__.append(bullet)
-        self.cooldown -= dt
+        pass
     
     def update_projectile_stats(self):
         self.damage_real = self.damage_base * self.damage_multiplier

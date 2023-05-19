@@ -2,7 +2,7 @@
 from ..misc import *
 from .GameObject import GameObject
 
-from pygame import image, surface, transform
+from pygame import Vector2, image, surface, transform
 
 import math
 
@@ -18,12 +18,11 @@ class Projectile(GameObject):
         self.life = kwargs.get("life") or 10
         self.total_life = self.life
 
-    def traj(self, pos: tuple, gun_velocity: tuple, speed: float, rot: float, speed_amp: float):
+    def traj(self, pos: Vector2, gun_velocity: Vector2, speed: float, rot: float, speed_amp: float):
         self.rot = rot
         self.set_pos(pos)
-        self.vel = element_add(gun_velocity, 
-                               (-speed * math.sin(math.radians(self.rot)) * speed_amp,
-                                -speed * math.cos(math.radians(self.rot)) * speed_amp))
+        self.vel = gun_velocity + Vector2(-speed * math.sin(math.radians(self.rot)) * speed_amp,
+                                    -speed * math.cos(math.radians(self.rot)) * speed_amp)
 
     def collisionEffect(self, dt, obj):
         if (obj.tag == PLAYER_TAG and self.tag == ENEMY_PROJECTILE_TAG) or\
@@ -33,8 +32,7 @@ class Projectile(GameObject):
             self.destroy()
 
     def update(self, dt: float, **kwargs):
-        self.set_pos(element_add(self.pos, scalar_mul(self.vel, dt)))
-        self.vel = element_add(self.vel, scalar_mul(self.acc, dt))
+        super().update(dt, **kwargs)
 
         self.life -= dt
         if self.life < 0:
@@ -44,5 +42,5 @@ class Projectile(GameObject):
         if self.collide_box(self.world.camera):  # render when object collide with camera view
             img0 = transform.rotate(self.texture, self.rot)
             img1 = transform.scale_by(img0, abs(self.life / self.total_life))
-            dummy = scalar_div(img1.get_size(), 2)
-            self.world.screen.blit(img1, element_sub(element_sub(self.pos, self.world.camera.topLeft), dummy))
+            dummy = Vector2(img1.get_size()) / 2
+            self.world.screen.blit(img1, (self.pos - self.world.camera.topLeft - dummy).xy)

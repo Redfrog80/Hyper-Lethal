@@ -1,4 +1,7 @@
 from .defaultWeapon import weapon
+from lib.misc import *
+from lib.objects import Projectile
+
 
 class bolter(weapon):
     def __init__(self, projectile_texture_name, projectile_tag, image_dict, sound_dict, **kwargs) -> None:
@@ -8,6 +11,7 @@ class bolter(weapon):
         self.damage_base = self.damage_base or 20
         self.firerate_base = self.firerate_base or .2
         self.range_base = self.range_base or 400
+        self.sound_name = self.sound_name or "bolter"
         
         self.projectile_velocity_base = kwargs.get("projectile_velocity") or 600
         self.projectile_count = kwargs.get("projectile_count") or 3
@@ -20,3 +24,21 @@ class bolter(weapon):
 
     def fire(self, dt,**kwargs ):
         return self.fire_projectile(dt,**kwargs)
+    
+    
+    def fire_projectile(self, dt, world,**kwargs):
+        if self.cooldown < 0:
+            self.sound_dict.get_sound(self.sound_name).play()
+            self.cooldown = self.firerate_real
+            for i in range(self.projectile_count):
+                bullet_rot = self.turret.rot + lerp(-self.projectile_firing_angle/2, self.projectile_firing_angle/2, (i+1)/(self.projectile_count+1))
+                bullet = Projectile(name = self.turret.name + "_b",
+                                    tag = self.projectile_tag,
+                                    damage = self.damage_real,
+                                    life = self.projectile_life,
+                                    texture_size = self.projectile_size,
+                                    texture_name = self.projectile_texture_name,
+                                    image_dict = self.image_dict)
+                bullet.traj(self.turret.pos, self.turret.vel, self.projectile_velocity_real, bullet_rot, 1)
+                world.__addlist__.append(bullet)
+        self.cooldown -= dt

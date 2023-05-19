@@ -1,3 +1,4 @@
+from pygame import Vector2
 from lib.misc import *
 from lib.objects.Collider import Collider
 
@@ -15,8 +16,8 @@ class Base(Collider):
 
         self.name = kwargs.get("name") or "unnamed_object"
         self.tag = kwargs.get("tag") or ""
-        self.vel = kwargs.get("vel") or (0,0)
-        self.acc = kwargs.get("acc") or (0,0)
+        self.vel = kwargs.get("vel") or Vector2(0,0)
+        self.acc = kwargs.get("acc") or Vector2(0,0)
         self.rot = kwargs.get("rot") or 0
         self.rotvel = kwargs.get("rotvel") or 0
         self.liveflag = 1  # use in GameWorld to check if object should be destroyed (go out of bound, died, etc.)
@@ -31,8 +32,8 @@ class Base(Collider):
         return bool(self.liveflag)
     
     def update(self, dt, **kwargs):
-        self.set_pos(element_add(self.pos, scalar_mul(self.vel, dt)))
-        self.vel = (element_add(self.vel, scalar_mul(self.acc, dt)))
+        self.set_pos(self.pos + self.vel * dt)
+        self.vel = self.vel + self.acc * dt
         
         self.rot += self.rotvel*dt
         while (abs(self.rot) > 180):

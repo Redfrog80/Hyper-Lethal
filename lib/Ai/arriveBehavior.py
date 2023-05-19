@@ -16,8 +16,8 @@ class arriveBehavior(steering):
         if not self.target.liveflag:
             return steering
         
-        direction = element_sub(self.target.pos, self.obj.pos)
-        distance = magnitude(direction)
+        direction = self.target.pos - self.obj.pos
+        distance = direction.magnitude()
         
         targetSpeed = 0
         
@@ -28,14 +28,13 @@ class arriveBehavior(steering):
         else:
             targetSpeed = steering_base.acc_max * (distance / self.slow_radius)
         
-        targetVel = scalar_mul(direction, targetSpeed / distance)
+        targetVel = direction.normalize() * targetSpeed
         
-        steering.acc = element_sub(targetVel, self.obj.vel)
+        steering.acc = targetVel - self.obj.vel
         
-        if (magnitude(steering.acc) > steering_base.acc_max):
-            steering.acc = scalar_mul(unit_tuple1(steering.acc), steering_base.acc_max)
-        
-        steering.acc = steering.acc
+        if steering.acc:
+            steering.acc.clamp_magnitude_ip(steering_base.acc_max)
+
         steering.rot_vel = 0
         
         return steering

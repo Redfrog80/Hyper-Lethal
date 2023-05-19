@@ -1,38 +1,39 @@
 from math import dist
 from lib.misc import *
+from pygame import Vector2
 
 class Collider:
     def __init__(self, **kwargs):
         
-        self.pos = kwargs.get("pos") or (0,0)
+        self.pos = kwargs.get("pos") or Vector2()
         self.radius = kwargs.get("radius") or 1
-        self.shape = kwargs.get("shape") or (1,1)
+        self.shape = kwargs.get("shape") or Vector2(1,1)
         self.__update__()
 
     def dist(self, other):
-        return dist(self.pos, other.pos)
+        return self.pos.distance_to(other.pos)
     
-    def set_pos(self, pos):
+    def set_pos(self, pos : Vector2):
         self.pos = pos
         self.__update__()
     
     def __update__(self):
-        self.top = int(self.pos[1] - self.radius*self.shape[1])
-        self.bottom = int(self.pos[1] + self.radius*self.shape[1])
-        self.left = int(self.pos[0] - self.radius*self.shape[0])
-        self.right = int(self.pos[0] + self.radius*self.shape[0])
-        self.topLeft = element_int(element_add(self.pos, (-self.radius*self.shape[0],-self.radius*self.shape[1])))
-        self.topRight = element_int(element_add(self.pos, (self.radius*self.shape[0],-self.radius*self.shape[1])))
-        self.bottomLeft = element_int(element_add(self.pos, (-self.radius*self.shape[0],self.radius*self.shape[1])))
-        self.bottomRight = element_int(element_add(self.pos, (self.radius*self.shape[0],self.radius*self.shape[1])))
+        self.top = int(self.pos.y - self.radius*self.shape.y)
+        self.bottom = int(self.pos.y + self.radius*self.shape.y)
+        self.left = int(self.pos.x - self.radius*self.shape.x)
+        self.right = int(self.pos.x + self.radius*self.shape.x)
+        self.topLeft = element_int(self.pos + Vector2(-self.radius*self.shape.x,-self.radius*self.shape.y))
+        self.topRight = element_int(self.pos + Vector2(self.radius*self.shape.x,-self.radius*self.shape.y))
+        self.bottomLeft = element_int(self.pos + Vector2(-self.radius*self.shape.x,self.radius*self.shape.y))
+        self.bottomRight = element_int(self.pos +  Vector2(self.radius*self.shape.x,self.radius*self.shape.y))
 
     def collide_circle(self, other)->bool:
-        mag = dist(self.pos, other.pos)
-        dif = element_sub(self.pos, other.pos)
+        mag = self.pos.distance_to(other.pos)
+        dif = self.pos - other.pos
         if (mag):
-            unit = scalar_div(dif,mag)
-            a = magnitude(element_mul(scalar_mul(unit,self.radius),self.shape))
-            b = magnitude(element_mul(scalar_mul(unit,other.radius),other.shape))
+            unit = dif/mag
+            a = self.radius*self.shape.x if (self.shape.x==self.shape.y) else (unit*self.radius*self.shape).magnitude()
+            b = other.radius*other.shape.x if (other.shape.x==other.shape.y) else (unit*other.radius*other.shape).magnitude()
             return (mag <= (a+b))
         else:
             return True
@@ -47,20 +48,20 @@ class Collider:
         return (dist(self.pos, point) <= self.radius)
     
     def resolve_circle_overlap(self,other):
-        mag = self.dist(other)
-        dif = element_sub(self.pos, other.pos)
+        mag = self.pos.distance_to(other.pos)
+        dif = self.pos - other.pos
         if (mag):
-            unit = scalar_div(dif,mag)
-            a = magnitude(element_mul(scalar_mul(unit,self.radius),self.shape))
-            b = magnitude(element_mul(scalar_mul(unit,other.radius),other.shape))
-            self.set_pos(element_add(self.pos,scalar_mul(unit,((a+b)-mag)/2)))
-            other.set_pos(element_add(other.pos,scalar_mul(unit,(-(a+b)+mag)/2)))
+            unit = dif/mag
+            a = self.radius*self.shape.x if (self.shape.x==self.shape.y) else (unit*self.radius*self.shape).magnitude()
+            b = other.radius*other.shape.x if (other.shape.x==other.shape.y) else (unit*other.radius*other.shape).magnitude()
+            self.set_pos(self.pos + unit*((a+b)-mag)/2)
+            other.set_pos(other.pos + unit*(-(a+b)+mag)/2)
     
     
     def get_direction(self, other)->bool:
-        mag = dist(self.pos, other.pos)
-        dif = element_sub(self.pos, other.pos)
+        mag = self.pos.distance_to(other.pos)
+        dif = self.pos - other.pos
         if (mag):
-            return scalar_div(dif,mag)
+            return dif/mag
         else:
-            return (0,0)
+            return Vector2(0,0)

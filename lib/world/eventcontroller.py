@@ -23,7 +23,7 @@ class EventController:
             self.player.stopAcc()
         elif (keys[K_w]):
             self.player.goForward()
-        elif (keys[K_w]):
+        elif (keys[K_s]):
             self.player.goBack()
         else:
             self.player.stopAcc()

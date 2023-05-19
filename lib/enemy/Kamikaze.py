@@ -14,19 +14,24 @@ class Kamikaze(Enemy):
         kwargs["texture_name"] = kwargs.get("texture_name") or "enemy1"
         
         enemy_hull = hull(30, 0.03)
-        enemy_thruster = thruster(600, 200, 360)
+        enemy_thruster = thruster(600, 400, 360)
+        
         self.steeringBehavior = steeringBehavior(self, 
                                                  enemy_thruster.get_acc(),
                                                  enemy_thruster.get_rot_vel())        
+        
         super().__init__(hull = enemy_hull,
                          thruster = enemy_thruster,
                          **kwargs)
+        
+        self.thruster.attach_parent(self)
+
         
         self.coll_damage = 10
         self.suicide = True
     
     def setTarget(self, target):
-        self.steeringBehavior.add_steering_behavior(pursueBehavior(1,2), target)
+        self.steeringBehavior.add_steering_behavior(pursueBehavior(1.5,2), target)
         self.steeringBehavior.add_steering_behavior(dragBehavior(1,.4))
         self.steeringBehavior.add_steering_behavior(faceVelBehavior(2), target)
         super().setTarget(target)

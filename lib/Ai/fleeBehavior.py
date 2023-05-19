@@ -14,7 +14,7 @@ class fleeBehavior(steering):
         if not self.target.liveflag:
             return steering
         
-        steering.acc = unit_tuple2(self.target.pos, self.obj.pos)
-        steering.acc = scalar_mul(steering.acc, -steering_base.acc_max)
+        steering.acc = (self.target.pos - self.obj.pos).normalize()
+        steering.acc = steering.acc * (-steering_base.acc_max)
         steering.rot_vel = 0
         return steering

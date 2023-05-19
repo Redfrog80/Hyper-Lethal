@@ -15,9 +15,9 @@ class evadeBehavior(steering):
         if not self.target.liveflag:
             return steering
         
-        direction = element_sub(self.target.pos, self.obj.pos)
-        distance = magnitude(direction)
-        speed = magnitude(self.target.vel)
+        diff = (self.target.pos - self.obj.pos)
+        distance = diff.magnitude()
+        speed = self.target.vel.magnitude()
         
         prediction = 0
         if (speed <= (distance / self.max_prediction)):
@@ -25,9 +25,9 @@ class evadeBehavior(steering):
         else:
             prediction = distance / speed
         
-        predictedPos = element_add(self.target.pos, scalar_mul(self.target.vel, prediction))
+        predictedPos = self.target.pos + self.target.vel * prediction
         
-        steering.acc = unit_tuple2(predictedPos, self.obj.pos)
-        steering.acc = scalar_mul(steering.acc, -steering_base.acc_max)
+        steering.acc = (predictedPos - self.obj.pos).normalize()
+        steering.acc = steering.acc * (-steering_base.acc_max)
         steering.rot_vel = 0
         return steering

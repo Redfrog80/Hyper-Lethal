@@ -6,3 +6,4 @@ drawing
 **/__pycache__/
 build/
 dist/
+waveform/

@@ -1,3 +1,4 @@
+from pygame import Vector2
 from lib.misc import *
 from .Base import Base
 
@@ -7,7 +8,7 @@ class Camera(Base):
         self.follow_distance = 0
         self.world = kwargs.get("world")
         self.target = kwargs.get("target") or None
-        self.shape = scalar_div(kwargs.get("screen_dim"),2)
+        self.shape = Vector2(kwargs.get("screen_dim")) / 2
 
     def set_world(self, world):
         self.world = world
@@ -22,7 +23,7 @@ class Camera(Base):
             length = self.dist(self.target)
             unit = self.get_direction(self.target)
             if length > self.follow_distance:
-                self.set_pos(element_add(self.pos,scalar_mul(unit, self.follow_distance-length)))
+                self.set_pos(self.pos + unit * (self.follow_distance-length))
 
     def update(self, dt: float, **kwargs):
         if self.world and self.target:

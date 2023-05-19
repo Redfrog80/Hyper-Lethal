@@ -1,4 +1,4 @@
-import pygame
+from pygame import draw
 from random import random
 from lib.Ai import *
 from .Playable import Playable
@@ -14,7 +14,7 @@ class Enemy(Playable):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         
-        self.steeringBehavior = steeringBehavior(self, 400, 90)
+        self.steeringBehavior = steeringBehavior(self, 400, 360)
         self.target = None
         
         self.coll_damage = 10
@@ -51,16 +51,16 @@ class Enemy(Playable):
             sound.play()
 
     def render(self):
-        
         # # Debugging - renders acc and vel vectors.
         # dummy = element_sub(self.pos, self.world.camera.topLeft)
-        # pygame.draw.line(self.world.screen,(0,200,0), dummy, element_add(dummy, self.vel), 2)
-        # pygame.draw.line(self.world.screen,(200,0,0), dummy, element_add(dummy, self.acc), 2)
+        # draw.line(self.world.screen,(0,200,0), dummy, element_add(dummy, self.vel), 2)
+        # draw.line(self.world.screen,(200,0,0), dummy, element_add(dummy, self.acc), 2)
+
         super().render()
 
     def update(self, dt: float, **kwargs):
         self.steeringBehavior.update(dt)
-        self.vel = self.thruster.check_vel(self.vel)
+        # self.thruster.update(dt)
         super().update(dt, **kwargs)
         
 
