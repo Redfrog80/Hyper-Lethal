@@ -1,0 +1,2 @@
+class item_manager():
+    

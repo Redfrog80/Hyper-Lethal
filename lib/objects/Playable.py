@@ -10,6 +10,8 @@ class Playable(GameObject):
 
         self.hull = hull
         self.thruster = thruster
+        
+        self.thruster.attach_parent(self)
 
     def set_world(self, world):
         super().set_world(world)
@@ -25,10 +27,11 @@ class Playable(GameObject):
             self.destroy()
     
     def update(self, dt, **kwargs):
+        self.thruster.update(dt)
         super().update(dt, **kwargs)
         self.hull.update(dt)
 
         if self.isDead():
             self.destroy()
         
-        self.vel = self.thruster.check_vel(self.vel)
+
