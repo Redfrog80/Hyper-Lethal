@@ -5,6 +5,6 @@ This project is a continuation of the Capsher game jam. This version is a comple
 Hyper-lethal will be a roguelite space adventure game designed with elements pulled from two of my favorite games, Nova Drift and Risk of Rain 2.
 
 # Credits
-Art and sound: @GageHoweTamu
-Current codebase and gameplay: @Redfrog80
-Legacy elements: @ptran779, Baconsizzle1738
+* Art and sound: @GageHoweTamu
+* Current codebase and gameplay: @Redfrog80
+* Legacy elements: @ptran779, Baconsizzle1738
